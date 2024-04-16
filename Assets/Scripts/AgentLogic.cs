@@ -308,7 +308,60 @@ public class AgentLogic : MonoBehaviour, IComparable
         }
     }
 
+
+    #region CalulateAgentDirectionQuadratically
     private AgentDirection CalculateAgentDirection(Vector3 selfPosition, Vector3 rayDirection, float sightFactor = 1.0f)
+    {
+        if (debug)
+        {
+            Debug.DrawRay(selfPosition, rayDirection * sight, visionColor);
+        }
+
+        //Calculate a random utility to initiate the AgentDirection.
+        var utility = Random.Range(Mathf.Min(randomDirectionValue.x, randomDirectionValue.y),
+            Mathf.Max(randomDirectionValue.x, randomDirectionValue.y));
+
+        //Create an AgentDirection struct with a random utility value [utility]. Ignores y component.
+        var direction = new AgentDirection(new Vector3(rayDirection.x, 0.0f, rayDirection.z), utility);
+
+        //Raycast into the rayDirection to check if something can be seen in that direction.
+        //The sightFactor is a variable that increases / decreases the size of the ray.
+        //For now, the sightFactor is only used to control the long sight in front of the agent.
+        if (Physics.Raycast(selfPosition, rayDirection, out RaycastHit raycastHit, sight * sightFactor))
+        {
+            if (debug)
+            {
+                Debug.DrawLine(selfPosition, raycastHit.point, foundColor);
+            }
+
+            //Calculate the normalized distance from the agent to the intersected object.
+            //Closer objects will have distancedNormalized close to 0, and further objects will have it close to 1.
+            var distanceNormalized = (raycastHit.distance / (sight * sightFactor));
+
+            //Calculate a quadratic utility based on the distanceNormalized.
+            var distanceIndex = 1.0f - Mathf.Pow(distanceNormalized, 2.0f);
+
+            //Calculate the utility of the found object according to its type.
+            utility = raycastHit.collider.gameObject.tag switch
+            {
+                //All formulas are the same. Only the weights change.
+                "Box" => distanceIndex * distanceFactor + boxWeight,
+                "Boat" => distanceIndex * boatDistanceFactor + boatWeight,
+                "Enemy" => distanceIndex * enemyDistanceFactor + enemyWeight,
+                _ => utility
+            };
+        }
+
+        direction.utility = utility;
+        return direction;
+    }
+
+    
+
+    #endregion
+
+    #region CalculateAgentDirectionLinearly
+    /*private AgentDirection CalculateAgentDirection(Vector3 selfPosition, Vector3 rayDirection, float sightFactor = 1.0f)
     {
         if (debug)
         {
@@ -353,7 +406,8 @@ public class AgentLogic : MonoBehaviour, IComparable
 
         direction.utility = utility;
         return direction;
-    }
+    }*/
+    #endregion
 
     /// <summary>
     /// Activates the agent update method.
@@ -377,6 +431,36 @@ public class AgentLogic : MonoBehaviour, IComparable
     public float GetPoints()
     {
         return points;
+    }
+    
+    public float GetSteps()
+    {
+        return steps;
+    }
+    
+    public float GetRayRadius()
+    {
+        return rayRadius;
+    }
+    
+    public float GetSight()
+    {
+        return sight;
+    }
+    
+    public float GetMovingSpeed()
+    {
+        return movingSpeed;
+    }
+    
+    public float GetBoxWeight()
+    {
+        return boxWeight;
+    }
+    
+    public float GetBoatWeight()
+    {
+        return boatWeight;
     }
 
     /// <summary>

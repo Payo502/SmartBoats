@@ -2,10 +2,16 @@
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Purchasing;
 using Random = UnityEngine.Random;
 
 public class GenerationManager : MonoBehaviour
 {
+    [Header("Data Recording")] [SerializeField]
+    private DataRecorder dataRecorder = new DataRecorder();
+    [Header("End Simulation")]
+    [SerializeField, Tooltip("After how many generations will the simulation end")] private int endSimulationNumber;
+    
     [Header("Generators")] [SerializeField]
     private GenerateObjectsInArea[] boxGenerators;
 
@@ -70,9 +76,20 @@ public class GenerationManager : MonoBehaviour
             ++generationCount;
             MakeNewGeneration();
             simulationCount = -Time.deltaTime;
+
+            if (ShouldEndSimulation())
+            {
+                dataRecorder.ExportData();
+                StopSimulation();
+            }
         }
 
         simulationCount += Time.deltaTime;
+    }
+
+    private bool ShouldEndSimulation()
+    {
+        return generationCount >= endSimulationNumber -1;
     }
 
 
@@ -162,7 +179,25 @@ public class GenerationManager : MonoBehaviour
 
         //Fetch parents
         _activeBoats.RemoveAll(item => item == null);
+        _activePirates.RemoveAll(item => item == null);
+        
         _activeBoats.Sort();
+        _activePirates.Sort();
+
+        if (_activeBoats.Any())
+        {
+            var bestNormalBoat = _activeBoats.First();
+            RecordDataNormalBoat(bestNormalBoat);
+        }
+
+        if (_activePirates.Any())
+        {
+            var bestPirateBoat = _activePirates.First();
+            RecordDataPirate(bestPirateBoat);
+        }
+        
+        dataRecorder.RecordGenerationCount(generationCount);
+        
         if (_activeBoats.Count == 0)
         {
             GenerateBoats(_boatParents);
@@ -197,6 +232,28 @@ public class GenerationManager : MonoBehaviour
                   lastPirateWinner.GetPoints() + " points!");
 
         GenerateObjects(_boatParents, _pirateParents);
+    }
+
+    private void RecordDataNormalBoat(BoatLogic bestNormalBoat)
+    {
+        dataRecorder.RecordNormalBoatPoints(bestNormalBoat.GetPoints());
+        dataRecorder.RecordNormalBoatSight(bestNormalBoat.GetSight());
+        dataRecorder.RecordNormalBoatSteps(bestNormalBoat.GetSteps());
+        dataRecorder.RecordNormalBoatMovingSpeed(bestNormalBoat.GetMovingSpeed());
+        dataRecorder.RecordNormalBoatRayRadius(bestNormalBoat.GetRayRadius());
+        dataRecorder.RecordNormalBoatBoxWeight(bestNormalBoat.GetBoxWeight());
+        dataRecorder.RecordNormalBoatWeight(bestNormalBoat.GetBoatWeight());
+    }
+    
+    private void RecordDataPirate(PirateLogic bestPirateBoat)
+    {
+        dataRecorder.RecordPiratePoints(bestPirateBoat.GetPoints());
+        dataRecorder.RecordPirateSight(bestPirateBoat.GetSight());
+        dataRecorder.RecordPirateSteps(bestPirateBoat.GetSteps());
+        dataRecorder.RecordPirateMovingSpeed(bestPirateBoat.GetMovingSpeed());
+        dataRecorder.RecordPirateRayRadius(bestPirateBoat.GetRayRadius());
+        dataRecorder.RecordPirateBoxWeight(bestPirateBoat.GetBoxWeight());
+        dataRecorder.RecordPirateBoatWeight(bestPirateBoat.GetBoatWeight());
     }
 
     /// <summary>

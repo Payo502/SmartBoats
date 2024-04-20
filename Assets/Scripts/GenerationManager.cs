@@ -8,7 +8,9 @@ using Random = UnityEngine.Random;
 public class GenerationManager : MonoBehaviour
 {
     [Header("Data Recording")] [SerializeField]
-    private DataRecorder dataRecorder = new DataRecorder();
+    private string testType;
+    private DataRecorder dataRecorder;
+    
     [Header("End Simulation")]
     [SerializeField, Tooltip("After how many generations will the simulation end")] private int endSimulationNumber;
     
@@ -61,6 +63,7 @@ public class GenerationManager : MonoBehaviour
 
     private void Start()
     {
+        dataRecorder = new DataRecorder(testType);
         if (runOnStart)
         {
             StartSimulation();

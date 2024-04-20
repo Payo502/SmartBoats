@@ -340,11 +340,11 @@ public class AgentLogic : MonoBehaviour, IComparable
             //var distanceIndex = 1.0f - distanceNormalized; // linear(original) utility function
             //var distanceIndex = 1.0f - Mathf.Pow(distanceNormalized, 2); // quadratic utility function
             
-            float decayrate = 0.5f;
-            var distanceIndex = 1.0f - Mathf.Exp(-distanceNormalized * decayrate); // exponential utility function (decayrate is a constant that controls the decay rate of the exponential function
+            //float decayrate = 0.5f;
+            //var distanceIndex = 1.0f - Mathf.Exp(-distanceNormalized * decayrate); // exponential utility function (decayrate is a constant that controls the decay rate of the exponential function
             
-            //float scaleParameter = 0.5f;
-            //var distanceIndex = 1.0f - Mathf.Log(1 + distanceNormalized * scaleParameter) // logarithmic utility function (scaleParameter is a constant that controls the scale of the logarithmic function)
+            float scaleParameter = 5f;
+            var distanceIndex = 1.0f - Mathf.Log(1 + distanceNormalized * scaleParameter); // logarithmic utility function (scaleParameter is a constant that controls the scale of the logarithmic function)
             
             //Calculate the utility of the found object according to its type.
             utility = raycastHit.collider.gameObject.tag switch

@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class DataRecorder
 {
+    private string testType;
+    
     private readonly List<int> generationCount = new();
     
     private readonly List<float> piratePointsOverGeneration = new();
@@ -28,6 +30,11 @@ public class DataRecorder
     private readonly List<float> pirateBoatWeightOverGeneration = new();
     private readonly List<float> normalBoatWeightOverGeneration = new();
 
+    public DataRecorder(string testType)
+    {
+        this.testType = testType;
+    }
+    
     public void RecordGenerationCount(int count)
     {
         generationCount.Add(count);
@@ -106,43 +113,44 @@ public class DataRecorder
     
     public void ExportData()
     {
-        string filePathPirateBoats = Application.dataPath + "/pirateBoatsData.csv";
-        string filePathNormalBoats = Application.dataPath + "/normalBoatsData.csv";
+        string baseFilePath = Application.dataPath + "/Data/" + testType + "/";
+        Directory.CreateDirectory(baseFilePath);
         
-        using var writerPirate = new StreamWriter(filePathPirateBoats);
-        using var writerNormal = new StreamWriter(filePathNormalBoats);
+        string filePathPirateBoats = baseFilePath + "pirateBoatsData.csv";
+        string filePathNormalBoats = baseFilePath + "normalBoatsData.csv";
 
-        writerPirate.WriteLine("Generation,Points,Steps,Ray Radius,Sight,Moving Speed,Box Weight,Weight");
-        
-        for (int i = 0; i < generationCount.Count; i++)
+        using (var writerPirate = new StreamWriter(filePathPirateBoats))
         {
-            writerPirate.WriteLine($"{generationCount[i]}," +
-                                   $"{piratePointsOverGeneration[i]}," +
-                                   $"{pirateStepsOverGeneration[i]}," +
-                                   $"{pirateRayRadiusOverGeneration[i]}," +
-                                   $"{pirateSightOverGeneration[i]}," +
-                                   $"{pirateMovingSpeedOverGeneration[i]}," +
-                                   $"{pirateBoxWeightOverGeneration[i]}," +
-                                   $"{pirateBoatWeightOverGeneration[i]}");
+            writerPirate.WriteLine("Generation,Points,Steps,Ray Radius,Sight,Moving Speed,Box Weight,Weight");
+            for (int i = 0; i < generationCount.Count; i++)
+            {
+                writerPirate.WriteLine($"{generationCount[i]}," +
+                                       $"{piratePointsOverGeneration[i]}," +
+                                       $"{pirateStepsOverGeneration[i]}," +
+                                       $"{pirateRayRadiusOverGeneration[i]}," +
+                                       $"{pirateSightOverGeneration[i]}," +
+                                       $"{pirateMovingSpeedOverGeneration[i]}," +
+                                       $"{pirateBoxWeightOverGeneration[i]}," +
+                                       $"{pirateBoatWeightOverGeneration[i]}");
+            }
         }
-
-        
-        
-        writerNormal.WriteLine("Generation,Points,Steps,Ray Radius,Sight,Moving Speed,Box Weight,Weight");
-        for (int i = 0; i < generationCount.Count; i++)
+        using (var writerNormal = new StreamWriter(filePathNormalBoats))
         {
-            writerNormal.WriteLine($"{generationCount[i]}," +
-                                   $"{normalBoatPointsOverGeneration[i]}," +
-                                   $"{normalBoatStepsOverGeneration[i]}," +
-                                   $"{normalBoatRayRadiusOverGeneration[i]}," +
-                                   $"{normalBoatSightOverGeneration[i]}," +
-                                   $"{normalBoatMovingSpeedOverGeneration[i]}," +
-                                   $"{normalBoatBoxWeightOverGeneration[i]}," +
-                                   $"{normalBoatWeightOverGeneration[i]}");
+            writerNormal.WriteLine("Generation,Points,Steps,Ray Radius,Sight,Moving Speed,Box Weight,Weight");
+            for (int i = 0; i < generationCount.Count; i++)
+            {
+                writerNormal.WriteLine($"{generationCount[i]}," +
+                                       $"{normalBoatPointsOverGeneration[i]}," +
+                                       $"{normalBoatStepsOverGeneration[i]}," +
+                                       $"{normalBoatRayRadiusOverGeneration[i]}," +
+                                       $"{normalBoatSightOverGeneration[i]}," +
+                                       $"{normalBoatMovingSpeedOverGeneration[i]}," +
+                                       $"{normalBoatBoxWeightOverGeneration[i]}," +
+                                       $"{normalBoatWeightOverGeneration[i]}");
+            }
         }
         Debug.Log($"Pirate Boat data exported to {filePathPirateBoats}!");
         Debug.Log($"Normal Boat data exported to {filePathNormalBoats}!");
-        
     }
     
 }

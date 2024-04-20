@@ -112,7 +112,7 @@ public class DataRecorder
         using var writerPirate = new StreamWriter(filePathPirateBoats);
         using var writerNormal = new StreamWriter(filePathNormalBoats);
 
-        writerPirate.WriteLine("Generation,Points Pirates,Steps Pirates,Ray Radius Pirates,Sight Pirates,Moving Speed Pirates, Box Weight Pirates, Boat Weight Pirates");
+        writerPirate.WriteLine("Generation,Points,Steps,Ray Radius,Sight,Moving Speed,Box Weight,Weight");
         
         for (int i = 0; i < generationCount.Count; i++)
         {
@@ -128,7 +128,7 @@ public class DataRecorder
 
         
         
-        writerNormal.WriteLine("Generation,Points Normal Boat,Steps Normal Boat,Ray Radius Normal Boat,Sight Normal Boat,Moving Speed Normal Boat, Box Weight Normal Boat, Boat Weight Normal Boat");
+        writerNormal.WriteLine("Generation,Points,Steps,Ray Radius,Sight,Moving Speed,Box Weight,Weight");
         for (int i = 0; i < generationCount.Count; i++)
         {
             writerNormal.WriteLine($"{generationCount[i]}," +
